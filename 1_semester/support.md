@@ -1,4 +1,7 @@
 # Вспомогательные материалы
+Презентации:
+* [Вторая пара](https://docs.google.com/presentation/d/1GLfZaFzX7bQl-Z9xZH1Pbfe2rv-uKxTwQcNaNEK-IGE/edit?usp=sharing)
+
 1) Вспомогательные материалы по видению
 - [8 Great Product Vision Examples](https://www.prodpad.com/blog/product-vision-examples/)
 - [How to define a product vision](https://www.product-bakery.com/blog/product-vision)
