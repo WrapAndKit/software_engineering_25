@@ -1,6 +1,12 @@
 # Вспомогательные материалы
 Презентации:
 * [Вторая пара](https://docs.google.com/presentation/d/1GLfZaFzX7bQl-Z9xZH1Pbfe2rv-uKxTwQcNaNEK-IGE/edit?usp=sharing)
+* [Третья пара](https://docs.google.com/presentation/d/1QK8bt--LF_QKAzOIeLMkYpGlrwaOexk95MLRfmCpnEA/edit?usp=sharing)
+
+Паттерны проектирования (по просьбе):
+- [A pattern language for microservices](https://microservices.io/patterns/index.html)
+- [Refactoring guru(доступ ограничен)]
+- [Шпаргалка по шаблонам проектирования](https://habr.com/ru/articles/210288/) 
 
 1) Вспомогательные материалы по видению
 - [8 Great Product Vision Examples](https://www.prodpad.com/blog/product-vision-examples/)
