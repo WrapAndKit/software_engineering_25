@@ -1,0 +1,20 @@
+@startuml Агрегация
+class Department {
+  -name: String
+  +getBudget(): double
+}
+
+class Professor {
+  -name: String
+  -specialty: String
+}
+
+' Агрегация (пустой ромб со стороны целого)
+Department o-- Professor
+
+note on link
+  Профессор может существовать
+  без кафедры (взять академический отпуск)
+  или перейти на другую кафедру.
+end note
+@enduml

@@ -1,0 +1,18 @@
+@startuml Направленная_ассоциация
+class Client {
+  -name: String
+  +makeOrder(): void
+}
+
+class Order {
+  -id: int
+  -date: Date
+}
+
+' Направленная ассоциация (Client знает об Order, но Order не знает о Client)
+' Client --> Order
+
+' С ролью и кратностью
+Client "1" --> "0..*" Order : создает
+
+@enduml

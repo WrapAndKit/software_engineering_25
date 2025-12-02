@@ -1,0 +1,69 @@
+@startuml Диаграмма_Вариантов_Использования_OnlineLibrary
+left to right direction
+skinparam packageStyle rectangle
+
+' Определение акторов
+actor "Гость" as Guest
+actor "Читатель" as Reader
+actor "Автор" as Author
+actor "Администратор" as Admin
+
+' Граница системы
+rectangle "Система онлайн-библиотеки BookHub" {
+
+  ' Варианты использования для Гостя
+  usecase "Просмотр каталога книг" as UC1
+  usecase "Просмотр деталей книги" as UC2
+  usecase "Регистрация в системе" as UC3
+
+  ' Варианты использования для Читателя
+  usecase "Вход в систему" as UC4
+  usecase "Поиск книг" as UC5
+  usecase "Добавить книгу в коллекцию" as UC6
+  usecase "Читать книгу онлайн" as UC7
+  usecase "Управление закладками" as UC8
+  usecase "Оставить рецензию" as UC9
+  usecase "Управление профилем" as UC10
+  usecase "Управление подпиской" as UC11
+
+  ' Варианты использования для Автора
+  usecase "Загрузить новую книгу" as UC12
+  usecase "Управление своими книгами" as UC13
+  usecase "Просмотр статистики" as UC14
+
+  ' Варианты использования для Администратора
+  usecase "Модерация книг" as UC15
+  usecase "Управление пользователями" as UC16
+  usecase "Управление жанрами" as UC17
+  usecase "Просмотр аналитики" as UC18
+}
+
+' Связи наследования (обобщения) между акторами
+Guest <|-- Reader
+Reader <|-- Author
+
+' Связи акторов с их основными вариантами использования
+Guest --> UC1
+Guest --> UC2
+Guest --> UC3
+
+Reader --> UC4
+Reader --> UC5
+Reader --> UC6
+Reader --> UC7
+Reader --> UC8
+Reader --> UC9
+Reader --> UC10
+Reader --> UC11
+
+Author --> UC12
+Author --> UC13
+Author --> UC14
+
+Admin --> UC15
+Admin --> UC16
+Admin --> UC17
+Admin --> UC18
+
+
+@enduml

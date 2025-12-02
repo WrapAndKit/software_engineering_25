@@ -1,0 +1,29 @@
+@startuml Реализация_интерфейса
+interface Printable {
+  +print(): void
+  +getPageCount(): int
+}
+
+class Report {
+  -content: String
+  +print(): void
+  +getPageCount(): int
+}
+
+class Image {
+  -pixels: byte[]
+  +print(): void
+  +getPageCount(): int
+}
+
+' Реализация интерфейса (пунктирная линия с треугольником)
+Printable <|.. Report
+Printable <|.. Image
+
+note top of Printable
+  Интерфейс определяет только
+  сигнатуры методов без реализации.
+  Классы обязаны реализовать
+  все его методы.
+end note
+@enduml

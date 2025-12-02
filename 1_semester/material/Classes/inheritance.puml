@@ -1,0 +1,27 @@
+@startuml Наследование
+class Vehicle {
+  #speed: double
+  +move(): void
+  +stop(): void
+}
+
+class Car {
+  -numWheels: int = 4
+  +honk(): void
+}
+
+class Bicycle {
+  -hasBell: boolean
+  +ringBell(): void
+}
+
+' Наследование (стрелка с треугольником)
+Vehicle <|-- Car
+Vehicle <|-- Bicycle
+
+note right of Vehicle
+  Абстрактный или базовый класс.
+  Связь показывает, что Car и Bicycle
+  являются частными случаями Vehicle.
+end note
+@enduml

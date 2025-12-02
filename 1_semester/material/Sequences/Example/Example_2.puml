@@ -1,0 +1,82 @@
+@startuml Sequence_Чтение_книги_с_закладками
+title Сценарий: Читатель открывает книгу и добавляет закладку
+
+actor Читатель
+participant "Читалка (SPA)" as ReaderUI
+participant "API шлюз" as APIGateway
+participant "Сервис контента" as ContentService
+participant "Сервис закладок" as BookmarkService
+participant "Сервис DRM" as DRMService
+participant "CDN" as CDN
+participant "БД пользовательских данных" as UserDB
+
+Читатель -> ReaderUI: Нажимает на книгу в коллекции
+activate ReaderUI
+
+ReaderUI -> APIGateway: GET /api/books/456/content?format=epub
+activate APIGateway
+
+APIGateway -> DRMService: checkAccess(userId=123, bookId=456)
+activate DRMService
+DRMService -> UserDB: Проверка лицензии
+activate UserDB
+UserDB --> DRMService: {hasAccess: true, licenseType: "subscription"}
+deactivate UserDB
+DRMService --> APIGateway: Access granted
+deactivate DRMService
+
+APIGateway -> ContentService: getBookContent(456, "epub")
+activate ContentService
+ContentService -> CDN: getSignedUrl("books/456.epub", expires=3600)
+activate CDN
+CDN --> ContentService: "https://cdn.example.com/books/456.epub?token=xyz"
+deactivate CDN
+ContentService --> APIGateway: {contentUrl: "...", format: "epub", totalPages: 320}
+deactivate ContentService
+
+' Параллельно загружаем закладки
+APIGateway -> BookmarkService: getBookmarks(userId=123, bookId=456)
+activate BookmarkService
+BookmarkService -> UserDB: SELECT * FROM bookmarks WHERE user_id=123 AND book_id=456
+activate UserDB
+UserDB --> BookmarkService: [{id: 1, page: 45, note: "Важный момент"}]
+deactivate UserDB
+BookmarkService --> APIGateway: {bookmarks: [...]}
+deactivate BookmarkService
+
+APIGateway --> ReaderUI: {contentUrl: "...", bookmarks: [...], metadata: {...}}
+deactivate APIGateway
+
+ReaderUI -> CDN: Загрузка контента по signed URL
+activate CDN
+CDN --> ReaderUI: EPUB файл (потоковая передача)
+deactivate CDN
+
+ReaderUI --> Читатель: Отображение книги с интерфейсом чтения
+deactivate ReaderUI
+
+...
+Читатель -> ReaderUI: Нажимает "Добавить закладку" на странице 78
+activate ReaderUI
+
+ReaderUI -> APIGateway: POST /api/books/456/bookmarks {page: 78, note: "Интересная цитата"}
+activate APIGateway
+
+APIGateway -> BookmarkService: createBookmark(userId=123, bookId=456, page=78, note="...")
+activate BookmarkService
+
+BookmarkService -> UserDB: INSERT INTO bookmarks ...
+activate UserDB
+UserDB --> BookmarkService: {id: 2, created: "2024-01-15"}
+deactivate UserDB
+
+BookmarkService --> APIGateway: {bookmarkId: 2, success: true}
+deactivate BookmarkService
+
+APIGateway --> ReaderUI: HTTP 201 Created
+deactivate APIGateway
+
+ReaderUI --> Читатель: Показ иконки закладки на странице 78
+deactivate ReaderUI
+
+@enduml

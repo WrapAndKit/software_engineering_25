@@ -1,0 +1,34 @@
+@startuml Пример_Sequence_ООП
+actor Пользователь
+participant "Клиентское приложение" as UI
+participant "Контроллер заказа" as Controller
+participant "Сервис оплаты" as Payment
+participant "База данных" as DB
+
+== Основной блок ==
+
+Пользователь -> UI: "Нажать 'Оплатить'"
+activate UI
+UI -> Controller: createOrder(cart)
+activate Controller
+Controller -> DB: save(order)
+activate DB
+DB --> Controller: orderId
+deactivate DB
+
+alt Успешная оплата
+    Controller -> Payment: processPayment(orderId)
+    activate Payment
+    Payment --> Controller: success
+    deactivate Payment
+    Controller --> UI: "Заказ подтвержден"
+else Ошибка оплаты
+    Controller --> UI: "Оплата не прошла"
+end
+
+UI --> Пользователь: Показать результат
+deactivate Controller
+deactivate UI
+== Основной блок ==
+
+@enduml

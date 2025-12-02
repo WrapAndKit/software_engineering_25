@@ -1,0 +1,36 @@
+@startuml Пример_Class
+
+interface Identifiable {
+    +getId(): Long
+}
+
+class User implements Identifiable {
+    -id: Long
+    -name: String
+    -email: String
+    +authenticate(password: String): Boolean
+}
+
+class ShoppingCart {
+    -items: List<CartItem>
+    +addProduct(p: Product, qty: int): void
+    +getTotal(): BigDecimal
+}
+
+class Order {
+    -id: Long
+    -status: String
+    +calculateTotal(): BigDecimal
+}
+
+class OrderItem {
+    -quantity: int
+    -price: BigDecimal
+}
+
+User "1" --> "0..*" Order : размещает
+Order "1" *-- "1..*" OrderItem : содержит
+ShoppingCart "1" --> "0..1" Order : преобразуется в
+OrderItem ..> Product : ссылается на
+
+@enduml

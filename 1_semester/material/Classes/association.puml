@@ -1,0 +1,18 @@
+@startuml Ассоциация
+class Professor {
+  -name: String
+  +teach(): void
+}
+
+class Course {
+  -title: String
+  -credits: int
+}
+
+' Простая ассоциация (двунаправленная по умолчанию)
+' Professor -- Course
+
+' Ассоциация с указанием ролей и кратности
+Professor "1" -- "*" Course : ведет
+' Символ > показывает направление чтения связи
+@enduml

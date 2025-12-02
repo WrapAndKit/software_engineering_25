@@ -1,0 +1,26 @@
+@startuml Зависимость
+class ReportGenerator {
+  +generateReport(data: ReportData): String
+  +exportToPDF(printer: PDFPrinter): void
+}
+
+class ReportData {
+  -title: String
+  -values: Map<String, Object>
+}
+
+class PDFPrinter {
+  +print(document: String): byte[]
+}
+
+' Зависимость (пунктирная стрелка)
+ReportGenerator ..> ReportData : использует как параметр
+ReportGenerator ..> PDFPrinter : использует как тип параметра
+
+note on link
+  Зависимость — самая слабая связь.
+  ReportGenerator не хранит постоянных
+  ссылок на ReportData или PDFPrinter,
+  а использует их временно в методах.
+end note
+@enduml

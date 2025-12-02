@@ -1,0 +1,20 @@
+@startuml Композиция
+class House {
+  -address: String
+  +openDoor(): void
+}
+
+class Room {
+  -area: double
+  -type: String
+}
+
+' Композиция (закрашенный ромб со стороны целого)
+House *-- Room
+
+note on link
+  Комната не может существовать
+  без дома. Уничтожение дома
+  влечет уничтожение всех комнат.
+end note
+@enduml

@@ -1,0 +1,249 @@
+@startuml ClassDiagram_Онлайн_Библиотека
+title Диаграмма классов системы онлайн-библиотеки
+
+' ====== Вспомогательные типы (Enums, Value Objects) ======
+enum BookFormat {
+  EPUB
+  PDF
+  AUDIO_MP3
+  MOBI
+}
+
+enum BookStatus {
+  DRAFT
+  PENDING_REVIEW
+  PUBLISHED
+  ARCHIVED
+}
+
+enum UserRole {
+  GUEST
+  READER
+  AUTHOR
+  ADMIN
+}
+
+enum SubscriptionTier {
+  FREE
+  BASIC
+  PREMIUM
+  FAMILY
+}
+
+
+class DateRange {
+  -start: LocalDateTime
+  -end: LocalDateTime
+  +contains(date: LocalDateTime): boolean
+  +duration(): Duration
+}
+
+' ====== Основные сущности (Core Domain) ======
+class User <<Entity>> {
+  -id: UUID
+  -email: String
+  -passwordHash: String
+  -roles: Set<UserRole>
+  -profile: UserProfile
+  +hasRole(role: UserRole): boolean
+  +canAccessBook(book: Book): boolean
+}
+
+class UserProfile <<ValueObject>> {
+  -displayName: String
+  -avatarUrl: String
+  -bio: String
+  -preferences: UserPreferences
+}
+
+class Book <<Entity>> {
+  -id: UUID
+  -isbn: String
+  -title: String
+  -description: String
+  -metadata: BookMetadata
+  -files: List<BookFile>
+  -status: BookStatus
+  +getAvailableFormats(): List<BookFormat>
+  +getFileByFormat(format: BookFormat): BookFile
+}
+
+class BookMetadata <<ValueObject>> {
+  -authors: List<Author>
+  -genres: List<Genre>
+  -publisher: String
+  -publishedDate: LocalDate
+  -language: String
+  -pageCount: Integer
+  -averageRating: Float
+}
+
+class BookFile <<Entity>> {
+  -id: UUID
+  -format: BookFormat
+  -fileUrl: String
+  -fileSize: Long
+  -drmProtected: Boolean
+  +getStream(): InputStream
+}
+
+class Author <<Entity>> {
+  -id: UUID
+  -user: User
+  -penName: String
+  -biography: String
+  -socialLinks: Map<String, String>
+  +getPublishedBooks(): List<Book>
+}
+
+class Genre <<Entity>> {
+  -id: UUID
+  -name: String
+  -slug: String
+  -parent: Genre
+  -description: String
+  +getAllSubgenres(): List<Genre>
+}
+
+' ====== Подписки и лицензии ======
+class Subscription <<Entity>> {
+  -id: UUID
+  -user: User
+  -tier: SubscriptionTier
+  -period: DateRange
+  -autoRenew: Boolean
+  -paymentInfo: PaymentInfo
+  +isActive(): boolean
+  +canReadBook(book: Book): boolean
+  +renew(): Subscription
+}
+
+class License <<Entity>> {
+  -id: UUID
+  -user: User
+  -book: Book
+  -acquiredAt: LocalDateTime
+  -expiresAt: LocalDateTime
+  -licenseType: LicenseType
+  +isValid(): boolean
+}
+
+' ====== Коллекции и чтение ======
+class UserBookCollection <<Aggregate Root>> {
+  -user: User
+  -books: Map<UUID, CollectedBook>
+  +addBook(book: Book, addedAt: LocalDateTime): void
+  +removeBook(bookId: UUID): void
+  +containsBook(bookId: UUID): boolean
+  +getReadingProgress(bookId: UUID): ReadingProgress
+}
+
+class CollectedBook <<Entity>> {
+  -book: Book
+  -addedAt: LocalDateTime
+  -lastOpenedAt: LocalDateTime
+  -tags: Set<String>
+}
+
+class ReadingSession <<Entity>> {
+  -id: UUID
+  -user: User
+  -book: Book
+  -startedAt: LocalDateTime
+  -lastActivityAt: LocalDateTime
+  -currentPosition: ReadingPosition
+  +updatePosition(position: ReadingPosition): void
+  +calculateDuration(): Duration
+}
+
+class ReadingPosition <<ValueObject>> {
+  -pageNumber: Integer
+  -percentage: Float
+  -location: String
+  -timestamp: LocalDateTime
+}
+
+class Bookmark <<Entity>> {
+  -id: UUID
+  -user: User
+  -book: Book
+  -position: ReadingPosition
+  -note: String
+  -color: String
+  -createdAt: LocalDateTime
+  +updateNote(newNote: String): void
+}
+
+' ====== Рецензии и рейтинги ======
+class Review <<Entity>> {
+  -id: UUID
+  -user: User
+  -book: Book
+  -rating: Integer <<1..5>>
+  -text: String
+  -editedAt: LocalDateTime
+  -likes: Set<UUID>
+  +updateText(newText: String): void
+  +like(userId: UUID): void
+}
+
+' ====== Сервисы (Domain Services) ======
+class BookRecommendationService <<Domain Service>> {
+  +getRecommendationsForUser(user: User, limit: int): List<Book>
+  +getSimilarBooks(book: Book, limit: int): List<Book>
+}
+
+class DRMService <<Domain Service>> {
+  +generateLicense(user: User, book: Book): License
+  +validateAccess(user: User, book: Book): boolean
+  +createWatermark(content: byte[], userId: UUID): byte[]
+}
+
+' ====== Связи между классами ======
+
+' Композиции
+User *-- UserProfile
+Book *-- BookMetadata
+Book *-- BookFile
+UserBookCollection *-- CollectedBook
+ReadingSession *-- ReadingPosition
+
+' Агрегации
+User o-- Subscription
+User o-- UserBookCollection
+User o-- Review
+
+' Ассоциации с кратностью
+User "1" --> "*" ReadingSession : имеет активные сессии
+Book "1" --> "*" Review : имеет рецензии
+Author "1" --> "*" Book : написал
+Book "*" --> "*" Genre : принадлежит к жанрам
+Subscription "1" --> "*" License : предоставляет лицензии
+
+' Наследование (нет в данной модели, но оставлю как пример)
+abstract class BaseEntity {
+  -id: UUID
+  -createdAt: LocalDateTime
+}
+BaseEntity <|-- User
+BaseEntity <|-- Book
+
+' Зависимости (использование в методах)
+BookRecommendationService ..> User : использует
+BookRecommendationService ..> Book : использует
+DRMService ..> License : создает
+
+note top of Book
+  Агрегатный корень для всего,
+  что связано с книгой.
+  Инвариант: книга должна иметь
+  хотя бы один файл для публикации.
+end note
+
+note right of UserBookCollection
+  Управляет всей коллекцией пользователя.
+  Гарантирует, что книга не добавляется
+  дважды, и обновляет lastOpenedAt.
+end note
+
+@enduml

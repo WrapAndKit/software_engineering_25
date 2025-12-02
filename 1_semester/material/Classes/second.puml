@@ -1,0 +1,82 @@
+@startuml Полный_пример_связей
+skinparam classAttributeIconSize 0
+
+' Интерфейсы и абстрактные классы
+interface IAuthenticable {
+  +login(username: String, password: String): boolean
+  +logout(): void
+}
+
+abstract class User {
+  #id: int
+  #name: String
+  +getInfo(): String
+}
+
+' Конкретные классы
+class Student {
+  -studentId: String
+  -grade: double
+  +submitAssignment(assignment: Assignment): void
+}
+
+class Teacher {
+  -employeeId: String
+  -department: String
+  +createAssignment(course: Course): Assignment
+}
+
+class Course {
+  -title: String
+  -code: String
+  +enroll(student: Student): boolean
+}
+
+class Assignment {
+  -title: String
+  -deadline: Date
+  +submit(): boolean
+}
+
+class Department {
+  -name: String
+  -budget: double
+}
+
+class University {
+  -name: String
+  -founded: int
+  +addDepartment(dept: Department): void
+}
+
+' Связи
+' 1. Реализация интерфейса
+IAuthenticable <|.. User
+
+' 2. Наследование
+User <|-- Student
+User <|-- Teacher
+
+' 3. Ассоциация с ролью и кратностью
+Teacher "1" -- "*" Course : преподает
+Student "*" -- "*" Course : посещает
+
+' 4. Направленная ассоциация
+Teacher --> Assignment : создает
+Student --> Assignment : отправляет
+
+' 5. Зависимость
+Student ..> Assignment : использует как параметр
+Teacher ..> Course : использует как параметр
+
+' 6. Агрегация (Университет имеет кафедры)
+University o-- Department : кафедры
+
+' 7. Композиция (Курс состоит из заданий)
+Course *-- Assignment : задания
+
+' 8. Простая ассоциация
+Department -- Teacher : сотрудники
+
+title Пример всех типов связей в UML
+@enduml

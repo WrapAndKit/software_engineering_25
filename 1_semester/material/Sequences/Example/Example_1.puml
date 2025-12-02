@@ -1,0 +1,65 @@
+@startuml Sequence_Добавление_книги_в_коллекцию
+title Сценарий: Читатель добавляет книгу в "Мои книги"
+
+actor Читатель
+participant "Веб-интерфейс" as UI
+participant "Контроллер библиотеки" as LibraryController
+participant "Сервис коллекции" as CollectionService
+participant "Сервис авторизации" as AuthService
+database "База данных" as DB
+collections "Кэш" as Cache
+
+Читатель -> UI: Нажимает "Добавить в мои книги" на странице книги
+activate UI
+
+UI -> LibraryController: POST /api/books/{id}/add-to-collection
+activate LibraryController
+
+LibraryController -> AuthService: validateToken(sessionToken)
+activate AuthService
+AuthService --> LibraryController: User {id: 123, role: "reader"}
+deactivate AuthService
+
+LibraryController -> CollectionService: addToCollection(userId: 123, bookId: 456)
+activate CollectionService
+
+' Проверка существования книги
+CollectionService -> DB: SELECT * FROM books WHERE id = 456
+activate DB
+DB --> CollectionService: Book {id: 456, title: "1984", available: true}
+deactivate DB
+
+' Проверка, не добавлена ли уже книга
+CollectionService -> DB: SELECT FROM user_books WHERE user_id=123 AND book_id=456
+activate DB
+DB --> CollectionService: 0 rows
+deactivate DB
+
+' Добавление в коллекцию
+CollectionService -> DB: INSERT INTO user_books (user_id, book_id, added_at)
+activate DB
+DB --> CollectionService: Success (id: 789)
+deactivate DB
+
+' Инвалидация кэша
+CollectionService -> Cache: delete("user:123:collection")
+activate Cache
+Cache --> CollectionService: OK
+deactivate Cache
+
+CollectionService --> LibraryController: {success: true, message: "Книга добавлена"}
+deactivate CollectionService
+
+' Подготовка ответа
+LibraryController -> Cache: set("book:456:details", bookData, 300)
+activate Cache
+Cache --> LibraryController: OK
+deactivate Cache
+
+LibraryController --> UI: HTTP 200 {status: "success"}
+deactivate LibraryController
+
+UI --> Читатель: Показ уведомления "Книга добавлена в вашу библиотеку"
+deactivate UI
+
+@enduml
