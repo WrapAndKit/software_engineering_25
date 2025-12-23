@@ -2,6 +2,8 @@
 Презентации:
 * [Вторая пара](https://docs.google.com/presentation/d/1GLfZaFzX7bQl-Z9xZH1Pbfe2rv-uKxTwQcNaNEK-IGE/edit?usp=sharing)
 * [Третья пара](https://docs.google.com/presentation/d/1QK8bt--LF_QKAzOIeLMkYpGlrwaOexk95MLRfmCpnEA/edit?usp=sharing)
+* [Четвертая пара](https://docs.google.com/presentation/d/1SFTfmjwlqLFm5b2RhGDZi1L3Ykmo2drmsfaRJ7gXPy8/edit?usp=sharing)
+* [Пятая пара](https://docs.google.com/presentation/d/120hbRuJOA4gPaZ4zxt7QAqXjhuCI6aV4Vi8ULcD3tZI/edit?usp=sharing)
 
 Паттерны проектирования (по просьбе):
 - [A pattern language for microservices](https://microservices.io/patterns/index.html)
@@ -20,3 +22,6 @@
 - [Выявление и сбор требований](https://tproger.ru/articles/vyjavlenie-i-sbor-trebovanij-k-po-ultimate-guide) - часть информации графическая
 - [Software Requirements по SWEBOK](https://web.archive.org/web/20100604013037/http://swebok.sorlik.ru/1_software_requirements.html)
 - [Анализ требований](https://ru.wikipedia.org/wiki/%D0%90%D0%BD%D0%B0%D0%BB%D0%B8%D0%B7_%D1%82%D1%80%D0%B5%D0%B1%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B9)
+3) Вспомогательные материалы по проектированию и написанию кода
+- [«Совершенный код» С. Макконнелла]
+- [«Чистый код» Р. Мартина] 
